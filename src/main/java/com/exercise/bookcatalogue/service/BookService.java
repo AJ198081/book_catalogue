@@ -49,6 +49,7 @@ public class BookService {
                 book.addAuthor(author);
             }
         }
+
         bookRepository.save(book);
 
         kafkaTemplate.send("bookCatalogue",
@@ -69,13 +70,17 @@ public class BookService {
                     .title(bookDto.getTitle())
                     .build();
 
-            final Set<Author> authors = bookDto.getAuthors();
-            for (Author author : authors) {
-                final Optional<Author> authorByName = authorRepository.findByName(author.getName());
-                if (authorByName.isPresent()) {
-                    book.addAuthor(authorByName.get());
-                } else {
-                    book.addAuthor(author);
+            if (bookDto.getAuthors().isEmpty()) {
+                book.setAuthors(bookById.get().getAuthors());
+            } else {
+                final Set<Author> authors = bookDto.getAuthors();
+                for (Author author : authors) {
+                    final Optional<Author> authorByName = authorRepository.findByName(author.getName());
+                    if (authorByName.isPresent()) {
+                        book.addAuthor(authorByName.get());
+                    } else {
+                        book.addAuthor(author);
+                    }
                 }
             }
             bookRepository.save(book);
@@ -91,25 +96,34 @@ public class BookService {
         }
     }
 
-
     public List<Book> getBooksByTitle(String title) {
+        List<Book> bookList = null;
 
         final Optional<List<Book>> listBooksByTitle = bookRepository.findByTitle(title);
 
-        if (!listBooksByTitle.get().isEmpty()) {
-            return listBooksByTitle.get();
-        } else {
-            throw new ExerciseCustomException("Unable to find any book for title " + title);
+        if (listBooksByTitle.isPresent()) {
+            if (!listBooksByTitle.get().isEmpty()) {
+                bookList = listBooksByTitle.get();
+            } else {
+                throw new ExerciseCustomException("Unable to find any book for title " + title);
+            }
         }
+        return bookList;
     }
 
     public List<Book> getBooksByIsbn(String isbn) {
+        List<Book> bookList = null;
+
         final Optional<List<Book>> listBooksByIsbn = bookRepository.findByIsbn(isbn);
-        if (!listBooksByIsbn.get().isEmpty()) {
-            return listBooksByIsbn.get();
-        } else {
-            throw new ExerciseCustomException("Unable to find any book for ISBN " + isbn);
+
+        if (listBooksByIsbn.isPresent()) {
+            if (!listBooksByIsbn.get().isEmpty()) {
+                bookList = listBooksByIsbn.get();
+            } else {
+                throw new ExerciseCustomException("Unable to find any book for ISBN " + isbn);
+            }
         }
+        return bookList;
     }
 
     public Set<Book> getBooksByAuthor(String authorName) {

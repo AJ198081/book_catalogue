@@ -31,7 +31,7 @@ public class Book implements Serializable {
 
     @NotNull
     @Column(unique = true, length = 13)
-    @Size(max = 13, message = "ISBN needs to be a 13 digit string")
+    @Size(max = 13, min = 13, message = "ISBN needs to be a 13 digit string")
     private String isbn;
 
     @PastOrPresent(message = "Publication date can't be in future")
