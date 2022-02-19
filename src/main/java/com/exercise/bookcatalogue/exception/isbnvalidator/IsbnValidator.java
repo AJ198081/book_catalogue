@@ -9,7 +9,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface IsbnValidator {
-    String message() default "{ISBN is a 10 or 13 digit number}";
+    String message() default "ISBN is a 10 or 13 digit number";
 
     Class<?> [] groups() default {};
 

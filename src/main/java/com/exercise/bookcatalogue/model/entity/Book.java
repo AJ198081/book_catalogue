@@ -32,7 +32,7 @@ public class Book implements Serializable {
 
     @NotNull
     @Column(unique = true, length = 13)
-    @IsbnValidator(message = "Please check ISBN")
+    @IsbnValidator(message = "ISBN is a 10 or 13 digit number, and needs to have a valid ISBN checksum.")
     private String isbn;
 
     @PastOrPresent(message = "Publication date can't be in future")
